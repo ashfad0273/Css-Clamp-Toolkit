@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Css Clamp Toolkit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: "#0b1220",
+            panel: "#141c2b",
+            text: "#e6edf6",
+            muted: "#9fb0c7",
+            border: "#243047",
+            accent: "#22c55e",
+            accent2: "#3b82f6",
+            warn: "#ef4444"
+          },
+          boxShadow: {
+            soft: "0 6px 30px rgba(0,0,0,.35)"
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass { backdrop-filter: blur(6px); }
+  </style>
+</head>
+<body class="bg-bg text-text min-h-screen">
+  <div class="max-w-6xl mx-auto p-6 md:p-10">
+    <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-semibold">Css Clamp Toolkit</h1>
+        <p class="text-muted mt-1">Build, organize, and export responsive CSS variables.</p>
+      </div>
+      <div class="flex gap-3">
+        <button id="btnDownload" class="px-4 py-2 rounded-xl bg-accent/90 hover:bg-accent text-black font-medium transition">
+          Download JSON
+        </button>
+        <label class="px-4 py-2 rounded-xl bg-panel border border-border cursor-pointer hover:bg-panel/70 transition">
+          <input id="fileInput" type="file" accept="application/json" class="hidden">
+          Upload JSON
+        </label>
+      </div>
+    </header>
+
+    <!-- Builder Card -->
+    <section class="mt-8 grid md:grid-cols-2 gap-6">
+      <div class="bg-panel/80 border border-border rounded-2xl p-5 shadow-soft">
+        <h2 class="text-xl font-medium mb-4">Inputs</h2>
+        
+
+<!-- Value Inputs -->
+<div class="grid grid-cols-[1fr_1fr_auto] gap-3">
+  <div>
+    <label class="block text-sm text-muted mb-1">Min Value</label>
+    <input id="minVal" type="number"
+           class="w-full bg-bg border border-border rounded-xl px-3 py-2 outline-none focus:border-accent"
+           placeholder="e.g., 16" value="16">
+  </div>
+
+  <div>
+    <label class="block text-sm text-muted mb-1">Max Value</label>
+    <input id="maxVal" type="number"
+           class="w-full bg-bg border border-border rounded-xl px-3 py-2 outline-none focus:border-accent"
+           placeholder="e.g., 32" value="32">
+  </div>
+
+  <div>
+    <label class="block text-sm text-muted mb-1">Unit</label>
+    <select id="valUnit"
+            class="w-[80px] bg-bg border border-border rounded-xl px-2 py-[9px] outline-none focus:border-accent text-sm">
+      <option value="px">px</option>
+      <option value="rem">rem</option>
+      <option value="em">em</option>
+      <option value="%">%</option>
+      <option value="vw">vw</option>
+      <option value="vh">vh</option>
+      <option value="vmin">vmin</option>
+      <option value="vmax">vmax</option>
+      <option value="">unitless</option>
+      <option value="custom">custom</option>
+    </select>
+  </div>
+</div>
+
+<!-- Viewport Inputs -->
+<div class="grid grid-cols-[1fr_1fr_auto] gap-3 mt-5">
+  <div>
+    <label class="block text-sm text-muted mb-1">Viewport Min</label>
+    <input id="vpMin" type="number"
+           class="w-full bg-bg border border-border rounded-xl px-3 py-2 outline-none focus:border-accent"
+           placeholder="e.g., 430" value="430">
+  </div>
+
+  <div>
+    <label class="block text-sm text-muted mb-1">Viewport Max</label>
+    <input id="vpMax" type="number"
+           class="w-full bg-bg border border-border rounded-xl px-3 py-2 outline-none focus:border-accent"
+           placeholder="e.g., 1200" value="1200">
+  </div>
+
+  <div>
+    <label class="block text-sm text-muted mb-1">Unit</label>
+    <select id="vpUnit"
+            class="w-[80px] bg-bg border border-border rounded-xl px-2 py-[9px] outline-none focus:border-accent text-sm">
+      <option value="px">px</option>
+      <option value="vw">vw</option>
+      <option value="vh">vh</option>
+      <option value="vmin">vmin</option>
+      <option value="vmax">vmax</option>
+    </select>
+  </div>
+</div>
+
+
+
+
+
+        <div class="mt-5">
+          <label class="block text-sm text-muted mb-1">Category</label>
+          <select id="categorySelect" class="w-full bg-bg border border-border rounded-xl px-3 py-2 outline-none focus:border-accent">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div class="mt-5">
+          <label class="block text-sm text-muted mb-1">Variable Name (without <code>--</code>)</label>
+          <input id="varName" type="text" class="w-full bg-bg border border-border rounded-xl px-3 py-2 outline-none focus:border-accent"
+                 placeholder="e.g., gap-32">
+          <p class="text-xs text-muted mt-1">Tip: Use a pattern like <code>gap-32</code>, <code>height-660</code>, etc.</p>
+        </div>
+
+        <div class="mt-6">
+          <label class="block text-sm text-muted mb-1">Generated clamp()</label>
+          <div id="clampPreview" class="font-mono bg-bg border border-border rounded-xl p-3 text-sm whitespace-nowrap overflow-auto">
+            clamp(16px, 7.06px + 2.08vw, 32px)
+          </div>
+          <div class="flex gap-3 mt-3">
+            <button id="btnCopyClamp" class="px-3 py-2 rounded-xl bg-panel border border-border hover:bg-panel/70 transition">
+              Copy clamp()
+            </button>
+            <button id="btnCreate" class="px-4 py-2 rounded-xl bg-accent/90 hover:bg-accent text-black font-medium transition">
+              Create Variable
+            </button>
+          </div>
+          <p class="text-xs text-muted mt-3">
+            Use in CSS — <code>your-class { font-size: <span id="inlineClamp">clamp(16px, 7.06px + 2.08vw, 32px)</span>; }</code>
+          </p>
+        </div>
+      </div>
+
+      <!-- :root export -->
+      <div class="bg-panel/80 border border-border rounded-2xl p-5 shadow-soft flex flex-col">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-medium">:root Export</h2>
+          <button id="btnBuildRoot" class="px-4 py-2 rounded-xl bg-accent2/90 hover:bg-accent2 text-white transition">Generate</button>
+        </div>
+        <p class="text-muted text-sm mt-1">Click the block to copy all variables.</p>
+        <pre id="rootBlock" class="mt-4 flex-1 font-mono bg-bg border border-border rounded-xl p-4 text-sm overflow-auto cursor-pointer select-text">
+:root {
+  /* variables will appear here */
+}
+        </pre>
+      </div>
+    </section>
+
+    <!-- Generated Variables -->
+    <section class="mt-10">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Generated Variables</h2>
+        <button id="btnClearAll" class="text-sm text-warn/90 hover:text-warn underline underline-offset-4">
+          Clear all
+        </button>
+      </div>
+      <div id="listArea" class="mt-5 space-y-8">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast -->
+  <div id="toaster" class="fixed bottom-4 left-1/2 -translate-x-1/2 space-y-2 z-50"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
